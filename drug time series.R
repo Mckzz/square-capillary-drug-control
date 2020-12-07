@@ -25,5 +25,5 @@ drug_curve.long$exposure <- as.factor(drug_curve.long$exposure)
 
 ggplot(data = drug_curve.long, aes(min, area, group = exposure)) +
   geom_line(aes(colour = factor(exposure))) +
-  labs(x = "min", y = "area") + 
+  labs(title= "2020 Nov 25, cAMP at 60 min, thaps + cAMP at 120 min", x = "min", y = "area") + 
   theme_classic()
