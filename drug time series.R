@@ -5,10 +5,10 @@ library(ggplot2)
 
 
 ####area plateaus
-rm(X8_Br_cAMP_rep_2)
+rm()
 
 
-drug_curve <- X2020_Dec_11_5_HT_meth
+drug_curve <- X2021_Feb_19_8_CPT_0_5_mM_rep_2
 print(drug_curve, n=50)
 
 drug_curve.long <- drug_curve %>% 
@@ -20,8 +20,6 @@ print(drug_curve.long, n=100)
 #so that $pH could be assigned colours
 drug_curve.long$exposure <- as.factor(drug_curve.long$exposure)
 
-###### single larva normalized to T0
-
 #making % change column
 drug_curve.long.pct <- drug_curve.long %>%
   group_by(exposure) %>%
@@ -32,15 +30,20 @@ drug_curve.long.pct <- drug_curve.long %>%
 
 print(drug_curve.long.pct, n=100)
 
+# remove over night time point
+drug_curve.long.pct <- drug_curve.long.pct %>%
+  mutate(area.pct.change = replace(area.pct.change, min == 260, NA))
+
+####### plot normalized to end equilibration
 ggplot(data = drug_curve.long.pct, aes(min, area.pct.change, group = exposure, colour = factor(exposure))) +
   geom_point(aes(colour = factor(exposure))) +
   geom_line(data= drug_curve.long.pct[!is.na(drug_curve.long.pct$area.pct.change),]) +
   #ylim(-2, 8) +
-  labs(x = "min", y = "area % change") + 
+  labs(x = "Min", y = "Area % change") + 
   #ggtitle("slide 3, replicate 6") +
   scale_x_continuous(breaks = scales::pretty_breaks(n = 16)) +
-  theme_classic()
-  theme(legend.position = "none")
+  theme_classic() #+
+ # theme(legend.position = "none")
 
 ###### single larva absolute values
 ggplot(data = drug_curve.long, aes(min, area, group = exposure, colour = factor(exposure))) +
@@ -52,9 +55,9 @@ ggplot(data = drug_curve.long, aes(min, area, group = exposure, colour = factor(
 
 
 ######################################    an experiment of n= ...    ########################################
-rm(X5_HT_1_uM_ALL)
+rm()
 
-combined_curve <- X8_br_cGMP_1_mM_ALL_cut_off_before_lys
+combined_curve <- N6Bnz_0_5_mM_trivittatus_ALL
 print(combined_curve, n=50)
 
 combined_curve.long <- combined_curve %>% 
@@ -76,6 +79,10 @@ print(combined_curve.long.pct, n=336)
 #so that $pH could be assigned colours
 combined_curve.long$exposure <- as.factor(combined_curve.long$exposure)
 
+# remove over night time point
+combined_curve.long.pct <- combined_curve.long.pct %>%
+  mutate(area.pct.change = replace(area.pct.change, min == 260, NA))
+
 ## compute means and sd
 mean.sd <-
   combined_curve.long.pct %>%
@@ -87,7 +94,9 @@ mean.sd <-
 
 print(mean.sd, n= 62)
 
-ggplot(data = mean.sd, aes(min, area.pct.change_mean, group = exposure, colour = factor(exposure))) +
+
+ggplot(data = mean.sd, 
+       aes(min, area.pct.change_mean, group = exposure, colour = factor(exposure))) +
   geom_point(aes(colour = factor(exposure))) +
   geom_line(data= mean.sd[!is.na(mean.sd$area.pct.change_mean),]) +
   geom_errorbar(mapping = aes(x = min,
@@ -95,9 +104,9 @@ ggplot(data = mean.sd, aes(min, area.pct.change_mean, group = exposure, colour =
                               ymax = area.pct.change_mean + area.pct.change_sd), 
                 width = 4,
                 size = 0.75) +
-  #ylim(-3, 27) +
-  #ggtitle("N6Bnz only, minus larva 4") +
-  labs(x = "min", y = "mean area") + 
+  ylim(-3, 15) +
+  ggtitle("N6Bnz 0.5 mM, trivittatus") +
+  labs(x = "Min", y = "Mean area change (%)") + 
   scale_x_continuous(breaks = scales::pretty_breaks(n = 16)) +
   theme_classic() +
   theme(legend.position = "none")
