@@ -5,9 +5,6 @@ library(ggplot2)
 
 
 ####area plateaus
-rm()
-
-
 drug_curve <- X2021_Feb_19_8_CPT_0_5_mM_rep_2
 print(drug_curve, n=50)
 
@@ -55,9 +52,7 @@ ggplot(data = drug_curve.long, aes(min, area, group = exposure, colour = factor(
 
 
 ######################################    an experiment of n= ...    ########################################
-rm()
-
-combined_curve <- N6Bnz_0_5_mM_trivittatus_ALL
+combined_curve <- X2021_Feb_bafilomycin_1_uM_ALL
 print(combined_curve, n=50)
 
 combined_curve.long <- combined_curve %>% 
@@ -104,9 +99,32 @@ ggplot(data = mean.sd,
                               ymax = area.pct.change_mean + area.pct.change_sd), 
                 width = 4,
                 size = 0.75) +
-  ylim(-3, 15) +
-  ggtitle("N6Bnz 0.5 mM, trivittatus") +
+  #ylim(-3, 15) +
+  #ggtitle("N6Bnz 0.5 mM, trivittatus") +
   labs(x = "Min", y = "Mean area change (%)") + 
   scale_x_continuous(breaks = scales::pretty_breaks(n = 16)) +
   theme_classic() +
   theme(legend.position = "none")
+
+
+###############################     stats     ################################
+
+#for equlb and last time points
+
+end.pct <- combined_curve.long.pct %>%
+  filter(min == 240)
+
+print(end.pct, n= 16)
+
+# produces a mean for the tratment that is the difference from the intercept (here, the control)
+mcmod.end.pct <-
+  MCMCglmm::MCMCglmm(
+    area.pct.change ~ exposure, random = ~larva,
+    data = end.pct, scale = FALSE,
+    nitt = 1300000, thin = 1000, burnin = 300000, 
+    verbose = FALSE
+  )
+summary(mcmod.end.pct)
+
+# How important is larval identity?
+mean(mcmod.end.pct$VCV[,1]/(mcmod.end.pct$VCV[,1] + mcmod.end.pct$VCV[,2]))

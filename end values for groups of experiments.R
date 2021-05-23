@@ -21,7 +21,13 @@ ggplot(cAMP_etc, aes(y = pct.change, x = Drug, colour= exp)) +
   labs(x = "exposure", y = "% change") + #labels axes
   theme_classic() +  #takes out background
   stat_summary(
-    fun.data = mean_sdl, position = position_dodge(width = 0.5), geom = "errorbar", width = 0.1, fun.args = list(mult=1)) +
+    fun.data = mean_sdl, 
+    position = position_dodge(width = 0.5), 
+    geom = "errorbar", 
+    width = 0.1, 
+    fun.args = list(mult=1)) +
   stat_summary(
-    fun = mean, geom = "point", position = position_dodge(width = 0.5),
+    fun = mean, 
+    geom = "point", 
+    position = position_dodge(width = 0.5),
     size = 3)
