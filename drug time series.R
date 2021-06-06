@@ -52,7 +52,7 @@ ggplot(data = drug_curve.long, aes(min, area, group = exposure, colour = factor(
 
 
 ######################################    an experiment of n= ...    ########################################
-combined_curve <- X2021_Feb_bafilomycin_1_uM_ALL
+combined_curve <- N6Bnz_0_5_mM_trivittatus_ALL
 print(combined_curve, n=50)
 
 combined_curve.long <- combined_curve %>% 
@@ -74,9 +74,9 @@ print(combined_curve.long.pct, n=336)
 #so that $pH could be assigned colours
 combined_curve.long$exposure <- as.factor(combined_curve.long$exposure)
 
-# remove over night time point
-combined_curve.long.pct <- combined_curve.long.pct %>%
-  mutate(area.pct.change = replace(area.pct.change, min == 260, NA))
+# remove over night time point (dont do for 1 mM 8-Br-cAMP because 260 is real (all went to 270))
+#combined_curve.long.pct <- combined_curve.long.pct %>%
+ # mutate(area.pct.change = replace(area.pct.change, min == 260, NA))
 
 ## compute means and sd
 mean.sd <-
@@ -90,8 +90,11 @@ mean.sd <-
 print(mean.sd, n= 62)
 
 
-ggplot(data = mean.sd, 
-       aes(min, area.pct.change_mean, group = exposure, colour = factor(exposure))) +
+ggplot(data = mean.sd,
+       aes(min, 
+           area.pct.change_mean, 
+           group = exposure, 
+           colour = factor(exposure))) +
   geom_point(aes(colour = factor(exposure))) +
   geom_line(data= mean.sd[!is.na(mean.sd$area.pct.change_mean),]) +
   geom_errorbar(mapping = aes(x = min,
@@ -111,6 +114,7 @@ ggplot(data = mean.sd,
 
 #for equlb and last time points
 
+#min = 270 for 1 mM 8-Br-cAMP, 240 for all else
 end.pct <- combined_curve.long.pct %>%
   filter(min == 240)
 
