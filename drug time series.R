@@ -50,7 +50,7 @@ ggplot(data = drug_curve.long, aes(min, area, group = exposure, colour = factor(
   scale_x_continuous(breaks = scales::pretty_breaks(n = 16)) +
   theme_classic()
 
-
+##
 ######################################    an experiment of n= ...    ########################################
 combined_curve <- N6Bnz_0_5_mM_trivittatus_ALL
 print(combined_curve, n=50)
