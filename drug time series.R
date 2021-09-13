@@ -2,7 +2,7 @@ install.packages("tidyverse")
 install.packages("ggplot2")
 library(tidyverse)
 library(ggplot2)
-
+library(lmerTest)
 
 ####area plateaus
 drug_curve <- X2021_Feb_19_8_CPT_0_5_mM_rep_2
@@ -52,7 +52,7 @@ ggplot(data = drug_curve.long, aes(min, area, group = exposure, colour = factor(
 
 ##
 ######################################    an experiment of n= ...    ########################################
-combined_curve <- N6Bnz_0_5_mM_trivittatus_ALL
+combined_curve <- X2021_Feb_8_CPT_0_5_mM_ALL
 print(combined_curve, n=50)
 
 combined_curve.long <- combined_curve %>% 
@@ -114,17 +114,24 @@ ggplot(data = mean.sd,
 
 #for equlb and last time points
 
-#min = 270 for 1 mM 8-Br-cAMP, 240 for all else
+#min = 240 as stopping point in the % change data to compare treat/ control differences at
 end.pct <- combined_curve.long.pct %>%
   filter(min == 240)
 
 print(end.pct, n= 16)
 
 # produces a mean for the tratment that is the difference from the intercept (here, the control)
+
+
+prior <- list(
+  R = list(V = 1, nu = 0.2), 
+  G = list(G = list(V = 2, nu = 0.2)))
+  #B = list(mu = 0, V=I*1e+10))
+
 mcmod.end.pct <-
   MCMCglmm::MCMCglmm(
     area.pct.change ~ exposure, random = ~larva,
-    data = end.pct, scale = FALSE,
+    data = end.pct, scale = FALSE, prior = prior,
     nitt = 1300000, thin = 1000, burnin = 300000, 
     verbose = FALSE
   )
@@ -132,3 +139,18 @@ summary(mcmod.end.pct)
 
 # How important is larval identity?
 mean(mcmod.end.pct$VCV[,1]/(mcmod.end.pct$VCV[,1] + mcmod.end.pct$VCV[,2]))
+
+
+
+####################  frequentist  ########################
+
+mod <- lmer(area.pct.change ~ exposure + (1|larva), data = end.pct)
+summary(mod)
+anova(mod)
+
+# could use lme4:: but gets rid of p value. Otherwise exact same estimates
+
+
+
+
+
