@@ -142,7 +142,7 @@ mean(mcmod.end.pct$VCV[,1]/(mcmod.end.pct$VCV[,1] + mcmod.end.pct$VCV[,2]))
 
 
 
-####################  frequentist  ########################
+####################  frequentist  #######################
 
 mod <- lmer(area.pct.change ~ exposure + (1|larva), data = end.pct)
 summary(mod)
