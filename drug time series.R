@@ -53,6 +53,7 @@ ggplot(data = drug_curve.long, aes(min, area, group = exposure, colour = factor(
 ##
 ######################################    an experiment of n= ...    ########################################
 combined_curve <- X2021_Feb_8_CPT_0_5_mM_ALL
+
 print(combined_curve, n=50)
 
 combined_curve.long <- combined_curve %>% 
@@ -120,13 +121,16 @@ end.pct <- combined_curve.long.pct %>%
 
 print(end.pct, n= 16)
 
+
 # produces a mean for the tratment that is the difference from the intercept (here, the control)
+
+#prior <- list(R = list(V = 1, nu = 0.002), G = list(G = list(V = 2, nu = 0.2)), B = list(mu = 0.02, V = 1e+08))
 
 
 prior <- list(
-  R = list(V = 1, nu = 0.2), 
-  G = list(G = list(V = 2, nu = 0.2)))
-  #B = list(mu = 0, V=I*1e+10))
+  R = list(V = 1, nu = 0.002), 
+  G = list(G = list(V = 1, nu = 0.002)))
+  #B = list(mu = 0.5, V = 1e08))
 
 mcmod.end.pct <-
   MCMCglmm::MCMCglmm(
@@ -136,11 +140,27 @@ mcmod.end.pct <-
     verbose = FALSE
   )
 summary(mcmod.end.pct)
+str(end.pct1)
 
 # How important is larval identity?
 mean(mcmod.end.pct$VCV[,1]/(mcmod.end.pct$VCV[,1] + mcmod.end.pct$VCV[,2]))
 
+# make data frame to do a pairs plot. data exploration (relationships between all variables)
+as.data.frame(end.pct)
 
+end.pct1 <- end.pct %>%
+  mutate_at("exposure", str_replace, "control", "0") %>%
+  mutate_at("exposure", str_replace, "treatment", "1")
+
+end.pct1$exposure <- as.numeric(end.pct1$exposure)
+
+print(end.pct1)
+
+pairs(end.pct1)
+
+m1 <- lm(area.pct.change ~ exposure, data = end.pct1)
+
+plot(mcmod.end.pct)
 
 ####################  frequentist  #######################
 
